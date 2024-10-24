@@ -1,0 +1,23 @@
+.App {
+  display: flex;
+
+}
+
+.App-header {
+  width: 250px; /* Adjust this width as needed */
+  background-color: #f0f0f0; /* Adjust the background color as needed */
+  
+}
+
+main {
+  margin-top: 12px;
+  flex-grow: 1;
+  /* padding: 20px; Adjust the padding as needed */
+}
+body{
+  overflow: hidden;
+  background: 
+  linear-gradient(0deg, rgba(237, 237, 237, 0.3) 0%, rgba(237, 237, 237, 0.3) 100%), 
+  linear-gradient(114deg, rgb(255, 255, 255) 23.5%, rgb(16, 105, 234) 147.39%);
+
+}

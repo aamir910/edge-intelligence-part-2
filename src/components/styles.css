@@ -1,0 +1,101 @@
+
+  .container1 {
+    background-color: black;
+    display: flex;
+    flex-direction: row;
+    align-items: center; /* Align items horizontally at the center */
+  }
+
+  .graph-container {
+    /* margin-bottom: 20px; Add some margin between the graph and the div */
+    margin-top: 48px;
+
+  }
+  .legend{
+    background-color: black;
+    color: white;
+    border :2px solid white ;
+    border-radius: 15px;
+  
+  }  
+.legend_main_box{
+  margin-top: 45px;
+  
+}
+
+  /* legend css   */
+
+ 
+.graph-container {
+    margin-bottom: 20px;
+}
+
+.legend {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+    margin: 20px;
+    
+}
+
+.legend ul {
+    padding: 5px;
+    margin: 0;
+}
+
+.legend li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    text-decoration: none;
+}
+
+.legend svg {
+    margin-right: 5px;
+}
+
+.scene-nav-info, .scene-tooltip {
+  position: absolute;
+  display: none !important; 
+  pointer-events: none;
+  user-select: none;
+} 
+
+/* legend css  */
+  /* line shape  */
+  .line {
+    display: inline-block;
+    width: 26px;
+    height: 6px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+.line-EBOM {
+    background: linear-gradient(to right, red, red);
+}
+.line-OrderCustomer {
+    background: linear-gradient(to right, blue, blue);
+}
+.line-PartNumberSupplyOrder {
+    background: linear-gradient(to right, green, green);
+}
+.line-PartNumberSellOrder {
+    background: linear-gradient(to right, orange, orange);
+}
+.line-OrderSupply {
+    background: linear-gradient(to right, purple, purple);
+}
+.line-Other {
+    background: linear-gradient(to right, grey, grey);
+}
+
+  /* line shape ended  */
+  .sprite-node:hover {
+    animation: none !important;
+  }
+  .checkbox1{
+    margin-right: 10px;
+    
+    margin-left: 5px;
+  }

@@ -1,0 +1,56 @@
+/* .navbar {
+    width: 100%;
+    background-color: #f0f0f0;
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: start;
+    justify-content: start;
+}
+
+.navbar-logo img {
+    height: 40px;
+} */
+.navbar {
+    width: 100%;
+    /* background-color: #f0f0f0; */
+
+    box-shadow: 0 6px 8px rgba(255, 255, 255, 0.1); /* Box shadow at the bottom */
+    padding: 10px 20px;
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+    display: inline-block;
+    align-items: start;
+    justify-content: start;
+    position: fixed;
+    top: 0;
+    /* z-index: 1000; */
+    transition: top 0.3s;
+    overflow: hidden; /* Prevent horizontal scrolling */
+}
+
+.navbar-logo img {
+    max-height: 40px; /* Limit the height of the logo */
+    max-width: 100%; /* Ensure the logo doesn't exceed the navbar width */
+}
+.navbar {
+    display: flex;
+    justify-content: space-between; /* Places one item on each side */
+    align-items: center;
+    padding: 10px 20px; /* Adjust padding as needed */
+  }
+  
+  .navbar-logo {
+    display: flex;
+    /* justify-content: space-between; */
+    width: 100%;
+    gap: 25rem;
+  }
+  
+  .navbar-logo img {
+    height: 50px; /* Adjust the height of the logos if necessary */
+  }
+  .logo-right {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }

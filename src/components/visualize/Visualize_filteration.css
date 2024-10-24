@@ -1,0 +1,258 @@
+.flex {
+    display: flex;
+  }
+  
+  .column {
+    flex-direction: column;
+  }
+  
+  .col-2 {
+    flex: 0 0 20%; /* Sidebar width */
+  }
+  
+  .col-12 {
+    flex: 1; /* Main content width */
+  }
+  
+  .main_visualize {
+    padding: 30px;
+  }
+  
+  .table-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px; /* Add margin between sections if needed */
+  }
+  
+  .table-section2 {
+    flex: 1;
+    /* margin-right: 20px; */
+  }
+  
+  .table-wrapper {
+    overflow-y: auto;
+    max-height: 30vh; /* Adjust as needed */
+    position: relative;
+  }
+  
+  .table2 {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: white;
+   
+  }
+  
+  .table2 th, .table2 td {
+      padding: 8px;
+      border: 1px solid #ddd;
+    text-align: left;
+
+  }
+ 
+  .table2 th {
+    background-color: #f2f2f2;
+    /* position: sticky; */
+    top: 0;
+    z-index: 1;
+    
+  }
+  
+  .entity_class {
+    background-color: #2a5594;
+    text-align: start;
+    padding: 5px;
+    color: white;
+    margin: 0;
+  }
+  
+  .link_color {
+    background-color: black;
+  }
+  
+  /* Adjustments for specific table styles */
+  .table2 td:first-child {
+    background-color: #f9f9f9;
+  }
+  
+
+ /* Basic styling for the dropdown */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown button styling */
+.dropbtn {
+  min-width: 250px;
+  background-color: whitesmoke;
+  color: black;
+  padding: 8px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  /* Add an arrow using CSS */
+  padding-right: 30px; /* Space for arrow */
+}
+
+.dropbtn::after {
+  content: '▼'; /* Down arrow */
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: black;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #ffffff; /* White background */
+  color: black; /* Black text */
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  width: 250px;
+}
+
+/* Dropdown content - show it when hovering on the dropdown button */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Dropdown content items (checkboxes) */
+.dropdown-content label {
+  display: block;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+/* Optional: Style checkboxes */
+.dropdown-content input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* Optional: Hover state for dropdown items */
+.dropdown-content label:hover {
+  background-color: #ddd;
+}
+
+.custom-entity-dropdown {
+  position: relative;
+  display: inline-block;
+  width: 250px; /* Adjust width as needed */
+}
+
+.custom-entity-dropdown select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #aaa;
+  border-radius: 5px;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.custom-entity-dropdown select:focus {
+  border-color: #2a5594;
+  outline: none;
+}
+
+.custom-entity-dropdown input {
+  margin-top: 8px;
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #aaa;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  font-size: 16px;
+  color: #333;
+
+}
+
+.custom-entity-dropdown input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.custom-entity-container {
+  display: flex;
+  align-items: center;
+}
+
+.Submit {
+  margin-top: 5px;
+  background-color: #2a5594;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-right: 10px; /* Space between the button and dropdown/input */
+}
+
+.Submit:hover {
+  background-color: #0056b3;
+}
+
+.custom-entity-dropdown {
+  display: flex;
+  flex-direction: column;
+}
+.SubmitDiv {
+  width: 100%;
+  display: flex;
+  /* flex-direction: column-reverse; */
+  justify-content: flex-end; /* Aligns items to the start (left) of the container */
+  top: 5%;
+}
+/* arrow button styles */
+.arrow-button {
+  font-size: 24px; /* Make the arrows large */
+  background: #c8e8f5; /* Button background */
+  border: none; /* Remove the button border */
+  cursor: pointer; /* Add a pointer cursor on hover */
+  padding: 0px;
+  margin-left: 5px;
+  width: 40px;
+}
+
+.arrow-button.active {
+  background-color: #007bff; /* Active background color */
+  color: white; /* Active text color */
+}
+
+/* Optional: styling for the non-active state */
+.arrow-button:not(.active) {
+  background: #c8e8f5; /* Button background */
+  color: black; /* Non-active text color */
+}
+
+
+.custom-button {
+  font-size: 16px; /* Adjust font size */
+  font-weight: bold; /* Make text bold */
+  background-color: #2a5594; /* Background color */
+  color: white; /* Text color */
+  border: none; /* Remove border */
+  border-radius: 4px; /* Rounded corners */
+  padding: 10px 20px; /* Padding inside the button */
+  cursor: pointer; /* Pointer cursor on hover */
+  margin-right: 10px; /* Margin between buttons */
+}
+
+.custom-button:hover {
+  background-color: #3cb9eb; /* Darker background on hover */
+}
+
+.inputcheck {
+  margin-right: 8px; /* Adds space between checkbox and label */
+}
+
+.dropdown-content label {
+  display: flex;
+  align-items: center;
+}
