@@ -112,7 +112,7 @@ const FileUploadSection = () => {
     <div style={{   height: '100%' }} >
       <Navbar image="newedgeintelligence.png" color="white" />
 
-<button style={{ backgroundColor: '#2a5594', color: 'white', marginTop: '5rem', marginLeft:"1rem", padding: '10px 20px', border: 'none', cursor: 'pointer' }}>
+<button style={{ backgroundColor: '#2a5594', color: 'white', marginTop: '2rem', marginLeft:"1rem", padding: '10px 20px', border: 'none', cursor: 'pointer' }}>
   <Link to="/visualize" style={{ color: 'white', textDecoration: 'none' }}>
     VISUALIZE
   </Link>
