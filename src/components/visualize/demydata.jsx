@@ -4,6 +4,7 @@ import Papa from "papaparse";
 import { Card, Popover } from "antd";
 import { ChromePicker } from "react-color";
 import * as THREE from "three";
+import Navbar from "./../NavBar/NavBar";
 
 const Force3D = () => {
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
@@ -75,6 +76,8 @@ const Force3D = () => {
   };
 
   const renderLegend = () => (
+    <>
+    
     <div>
       <p><strong>Node Types:</strong></p>
       {legendData.nodes.map((group, idx) => (
@@ -130,9 +133,12 @@ const Force3D = () => {
         </Popover>
       ))}
     </div>
+    </>
   );
 
   return (
+
+<>
     <div
       style={{
         display: "flex",
@@ -154,7 +160,7 @@ const Force3D = () => {
         {renderLegend()}
       </Card>
 
-      <Card
+      <div
         title="3D Force Network Graph"
         style={{
           width: "80vw",
@@ -226,8 +232,10 @@ const Force3D = () => {
             }}
           />
         </div>
-      </Card>
+      </div>
     </div>
+</>
+
   );
 };
 
