@@ -122,7 +122,7 @@ const FileUploadSection = () => {
         >
           <Spin spinning={loading}> {/* Wrap content inside Spin */}
             <Row gutter={[24, 24]} justify="center" >
-                 <Col xs={24} sm={4} md={4}>
+                 <Col xs={24} sm={4 } md={4}>
                  <button style={{ backgroundColor: '#2a5594', color: 'white', padding: '10px 20px', border: 'none', cursor: 'pointer' }}>
   <Link to="/visualize" style={{ color: 'white', textDecoration: 'none' }}>
     VISUALIZE

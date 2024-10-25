@@ -35,27 +35,7 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
   const fgRef = useRef();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
 
-  const getRepeatingNodes = (nodes) => {
-    const seenIds = new Set();
-    const repeatingNodes = [];
-
-    nodes.forEach((node) => {
-      if (seenIds.has(node.id)) {
-        repeatingNodes.push(node);
-      } else {
-        seenIds.add(node.id);
-      }
-    });
-
-    return repeatingNodes;
-  };
-  const repeatingNodes = getRepeatingNodes(graphData.nodes);
-
-  if (repeatingNodes.length > 0) {
-    console.log("Repeating nodes:", repeatingNodes);
-  } else {
-    console.log("All nodes are unique.");
-  }
+ 
 
   const [tooltip, setTooltip] = useState({
     visible: false,
@@ -78,10 +58,10 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
   });
   const [linkColors, setLinkColors] = useState({
           E_BOM: "white",
-    E_ORDERCUST: "lightblue",
-    E_ORDERSUPP: "orange",
-    E_PNSELLORD: "cyan",
-    E_PNSUPPORD: "lime",
+          E_ORDERCUST: "lightblue",
+          E_ORDERSUPP: "orange",
+          E_PNSELLORD: "cyan",
+         E_PNSUPPORD: "lime",
   });
 
   const [selectedLinkType, setSelectedLinkType] = useState("");

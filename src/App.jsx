@@ -8,11 +8,12 @@ import MainContent from "./components/Maincontent/Maincontent";
 import "./App.css";
 // import FileUploadSection from "./components/FileUpload/FileUpload";
 import FileUploadSection from "./components/FileUpload/uploadworking";
+import Force3D from "./components/visualize/demydata";
 
 const App = () => {
   return (
-    <Router>  
-      <div className="App"> 
+    <Router>
+      <div className="App">
         {/* 
         <Sidebar className="App-header">
 
@@ -25,7 +26,7 @@ const App = () => {
               <Routes>
                 {/* <Route path="/" element={<Sidebar />} /> */}
 
-                <Route path="/" element={<FileUploadSection />} />
+                <Route path="/" element={<Force3D />} />
                 <Route path="/visualize" element={<Visualize_filteration />} />
                 {/* <Route path="/CONFIGURATION" element={<MainContent />} /> */}
                 <Route path="/3d_graph" element={<ForceGraph2DComponent />} />
