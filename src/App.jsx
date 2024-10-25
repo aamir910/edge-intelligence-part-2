@@ -28,7 +28,7 @@ const App = () => {
 
                 {/* <Route path="/" element={<Force3D />} /> */}
                 
-                <Route path="/" element={<Visualize_filteration />} />
+                <Route path="/" element={<FileUploadSection />} />
                 <Route path="/visualize" element={<Visualize_filteration />} />
                 {/* <Route path="/CONFIGURATION" element={<MainContent />} /> */}
                 <Route path="/3d_graph" element={<ForceGraph2DComponent />} />
