@@ -343,7 +343,7 @@ const getLinkName = (filePath) => {
         <Spin size="large" style={{ textAlign: 'center', padding: '50px' , display:"flex" ,justifyContent:"center" , alignItems:"center"}} />
       ) : (
       
-        <div className="row main_visualize col-10"   style={{
+        <div className="table_class  col-10"   style={{
     // background: "red",
     height: "89vh", // Fill the entire viewport height
     // position: "fixed", // Make it fixed
@@ -363,7 +363,7 @@ const getLinkName = (filePath) => {
                 Filter by id
               </button>
             </div>
-
+  <div style={{display:"flex" ,flexDirection:"row"}}>
             <div className="col-7">
               <div className="table-container">
                 <div className="table-section1">
@@ -503,8 +503,7 @@ const getLinkName = (filePath) => {
 
                           {Object.entries(entityHeaders).map(
                             ([filePath, headers], index) => {
-                              console.log(linkHeaders , "linkFiles2 linkFiles2linkFiles2linkFiles2linkFiles2")
-                              if (uniqueData.length !== 0) {
+                               if (uniqueData.length !== 0) {
                                 const entityName = getEntityName(filePath);
                                 return (
                                   <tr key={index}>
@@ -615,7 +614,7 @@ const getLinkName = (filePath) => {
               </div>
             </div>
           </div>
-     
+          </div>
       
       )}
     
