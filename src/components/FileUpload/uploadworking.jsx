@@ -112,12 +112,6 @@ const FileUploadSection = () => {
     <div style={{   height: '100%' }} >
       <Navbar image="newedgeintelligence.png" color="white" />
 
-<button style={{ backgroundColor: '#2a5594', color: 'white', marginTop: '2rem', marginLeft:"1rem", padding: '10px 20px', border: 'none', cursor: 'pointer' }}>
-  <Link to="/visualize" style={{ color: 'white', textDecoration: 'none' }}>
-    VISUALIZE
-  </Link>
-</button>   
-    
     
     
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90%' }}>
@@ -128,6 +122,15 @@ const FileUploadSection = () => {
         >
           <Spin spinning={loading}> {/* Wrap content inside Spin */}
             <Row gutter={[24, 24]} justify="center" >
+                 <Col xs={24} sm={4} md={4}>
+                 <button style={{ backgroundColor: '#2a5594', color: 'white', padding: '10px 20px', border: 'none', cursor: 'pointer' }}>
+  <Link to="/visualize" style={{ color: 'white', textDecoration: 'none' }}>
+    VISUALIZE
+  </Link>
+</button>   
+    
+              
+              </Col>
               <Col xs={24} sm={12} md={8} >
                 {/* Entity Section */}
                 <Card
@@ -150,17 +153,7 @@ const FileUploadSection = () => {
                   </Button>
                 </Card>
               </Col>
-              {/* <Col xs={24} sm={12} md={8}>
-              
-                <Card
-                  title={<div style={{ color: "white", backgroundColor: '#2a5594', padding: '1px', borderRadius: '4px' }}>ICON</div>}
-                >
-                  {renderFileList(iconFiles, setIconFiles, ".png,.jpg,.jpeg")}
-                  <Button onClick={() => setIconFiles([...iconFiles, { file: null, name: 'Enter file', loaded: false }])} type="dashed" block>
-                    Add More File
-                  </Button>
-                </Card>
-              </Col> */}
+           
 
             </Row>
             <div style={{gap:"50px", display:"flex" ,  justifyContent: "center"}}>
