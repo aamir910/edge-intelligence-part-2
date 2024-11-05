@@ -541,8 +541,7 @@ const ForceGraph2DComponent = () => {
           // filter by dropdowns
 
           if (Object.keys(SingleCheckCustomer)[0] === "") {
-            alert("check");
-
+         
             let filteredData = result.data.filter((row) => {
               return (
                 checkedLinkNames.includes(row.Edge_Type) &&
