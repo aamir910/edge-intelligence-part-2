@@ -6,6 +6,7 @@ import * as THREE from "three";
 import "./styles.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./NavBar/NavBar";
+
 import { Link } from "react-router-dom";
 const predefinedColors = [
   "white",
@@ -28,14 +29,38 @@ const ForceGraph2DComponent = () => {
 
   const checkedDropdownItems = location.state?.checkedDropdownItems || [];
 
+  const arrays = location.state?.arrays || [];
   const SingleCheckCustomer = location.state?.inputData || [];
-console.log(SingleCheckCustomer ,"SingleCheckCustomer")
+
   const isAscending = location.state?.isAscending || false;
-  
+  console.log(arrays, "arrays arrays arrays");
+
+  console.log(SingleCheckCustomer, "SingleCheckCustomer SingleCheckCustomer");
+
   const fgRef = useRef();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
 
- 
+  const getRepeatingNodes = (nodes) => {
+    const seenIds = new Set();
+    const repeatingNodes = [];
+
+    nodes.forEach((node) => {
+      if (seenIds.has(node.id)) {
+        repeatingNodes.push(node);
+      } else {
+        seenIds.add(node.id);
+      }
+    });
+
+    return repeatingNodes;
+  };
+  const repeatingNodes = getRepeatingNodes(graphData.nodes);
+
+  if (repeatingNodes.length > 0) {
+    console.log("Repeating nodes:", repeatingNodes);
+  } else {
+    console.log("All nodes are unique.");
+  }
 
   const [tooltip, setTooltip] = useState({
     visible: false,
@@ -49,20 +74,47 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
     y: 0,
     type: "",
   });
-  const [nodeColors, setNodeColors] = useState({
-    N_CUSTOMER: "white",
-    N_PARTNUMBER: "lightblue",
-    N_PURCHORDER: "orange",
-    N_SELLORDER: "cyan",
-    N_SUPPLIER: "lime",
-  });
-  const [linkColors, setLinkColors] = useState({
-          E_BOM: "white",
-          E_ORDERCUST: "lightblue",
-          E_ORDERSUPP: "orange",
-          E_PNSELLORD: "cyan",
-         E_PNSUPPORD: "lime",
-  });
+
+  // const [nodeColors, setNodeColors] = useState({
+  //   N_CUSTOMER1: "white",
+  //   N_PARTNUMBER1: "lightblue",
+  //   N_PURCHORDER1: "orange",
+  //   N_SELLORDER1: "cyan",
+  //   N_SUPPLIER1: "lime",
+  // });
+
+  // const [linkColors, setLinkColors] = useState({
+  //   E_BOM1: "white",
+  //   E_ORDERCUST1: "lightblue",
+  //   E_ORDERSUPP1: "orange",
+  //   E_PNSELLORD1: "cyan",
+  //   E_PNSUPPORD1: "lime",
+  // });
+
+  const assignColors = (keys, colors) => {
+    return keys.reduce((acc, key, index) => {
+      acc[key] = colors[index % colors.length]; // Cycle through colors if keys exceed the array length
+      return acc;
+    }, {});
+  };
+
+  // Set initial colors for node and link keys
+  const [nodeColors, setNodeColors] = useState({});
+  const [linkColors, setLinkColors] = useState({});
+
+  useEffect(() => {
+    // Assign colors to node keys
+    console.log(checkedEntityNames, "checkedEntityNames");
+    const newNodeColors = assignColors(checkedEntityNames, predefinedColors);
+    setNodeColors(newNodeColors);
+
+    // Assign colors to link keys
+    const newLinkColors = assignColors(checkedLinkNames, predefinedColors);
+    setLinkColors(newLinkColors);
+  }, [checkedEntityNames, checkedLinkNames]);
+
+  console.log("Node Colors:", nodeColors);
+  console.log("Link Colors:", linkColors);
 
   const [selectedLinkType, setSelectedLinkType] = useState("");
   const [excludedTypes, setExcludedTypes] = useState([]);
@@ -79,13 +131,35 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
       });
     }
   }
+  console.log(checkedDropdownItems, "checkedDropdownItems");
+  const nCustomer = checkedDropdownItems["N_CUSTOMER1"] || {};
+  const nPartNumber = checkedDropdownItems["N_PARTNUMBER1"] || {};
+  const nPurchOrder = checkedDropdownItems["N_PURCHORDER1"] || {};
+  const nSellOrder = checkedDropdownItems["N_SELLORDER1"] || {};
+  const nSupplier = checkedDropdownItems["N_SUPPLIER1"] || {};
 
-  const nCustomer = checkedDropdownItems["N_CUSTOMER"] || {};
-  const nPartNumber = checkedDropdownItems["N_PARTNUMBER"] || {};
-  const nPurchOrder = checkedDropdownItems["N_PURCHORDER"] || {};
-  const nSellOrder = checkedDropdownItems["N_SELLORDER"] || {};
-  const nSupplier = checkedDropdownItems["N_SUPPLIER"] || {};
+  const processCSV = (data) => {
+    const nodesMap = {};
 
+    // const links = data.slice(0, 50).map((row) => {
+
+    const links = data.map((row) => {
+      const { Entity_1, Entity_2, Entity_Type_1, Entity_Type_2, Edge_Type } =
+        row;
+
+      if (!nodesMap[Entity_1]) {
+        nodesMap[Entity_1] = { id: Entity_1, group: Entity_Type_1 };
+      }
+      if (!nodesMap[Entity_2]) {
+        nodesMap[Entity_2] = { id: Entity_2, group: Entity_Type_2 };
+      }
+
+      return { source: Entity_1, target: Entity_2, type: Edge_Type };
+    });
+
+    const nodes = Object.values(nodesMap);
+    setGraphData({ nodes, links });
+  };
   function filterByNCustomer(data) {
     const filteredData = data.filter((item) => {
       const matchesCustomer =
@@ -219,29 +293,6 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
 
     return filteredData;
   }
-  const processCSV = (data) => {
-    const nodesMap = {};
-
-  
-    // const links = data.slice(0, 50).map((row) => {
-
-    const links = data.map((row) => {
-      const { Entity_1, Entity_2, Entity_Type_1, Entity_Type_2, Edge_Type } =
-        row;
-
-      if (!nodesMap[Entity_1]) {
-        nodesMap[Entity_1] = { id: Entity_1, group: Entity_Type_1 };
-      }
-      if (!nodesMap[Entity_2]) {
-        nodesMap[Entity_2] = { id: Entity_2, group: Entity_Type_2 };
-      }
-
-      return { source: Entity_1, target: Entity_2, type: Edge_Type };
-    });
-
-    const nodes = Object.values(nodesMap);
-    setGraphData({ nodes, links });
-  };
 
   function filterByN_PurchOrder(data) {
     const filteredData = data.filter((item) => {
@@ -330,13 +381,15 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
       const { Entity_1, Entity_2 } = row;
 
       if (addnodestemp.includes(Entity_2)) {
-        if (
-          row.Entity_Type_1 === "N_PARTNUMBER" &&
-          row.Entity_Type_2 === "N_PARTNUMBER"
-        ) {
-     
+        // if (
+        //   row.Entity_Type_1 === "N_PARTNUMBER" &&
+        //   row.Entity_Type_2 === "N_PARTNUMBER"
+        // ) {
 
-          
+        if (
+          row.Entity_Type_1 === row.Entity_Type_2
+          // false
+        ) {
           // if (addnodestemp.includes(Entity_1)) {
           //   if (Entity_1 > Entity_2) {
           //     addnodes2.push(Entity_1);
@@ -346,9 +399,8 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
           //   }
           // }
 
-
           if (isAscending) {
-          if (addnodestemp.includes(Entity_2)) {
+            if (addnodestemp.includes(Entity_2)) {
               if (Entity_1 < Entity_2) {
                 addnodes2.push(Entity_1);
                 return true; // Include this row
@@ -357,20 +409,16 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
               }
             }
           } else {
-
-          if (addnodestemp.includes(Entity_1)) {
-            if (Entity_1 > Entity_2) {
-              addnodes2.push(Entity_1);
-              return true; // Include this row
-            } else {
-              return false;
+            if (addnodestemp.includes(Entity_1)) {
+              if (Entity_1 > Entity_2) {
+                addnodes2.push(Entity_1);
+                return true; // Include this row
+              } else {
+                return false;
+              }
             }
           }
-   
-          }
-
-        }
-        else {
+        } else {
           addnodes2.push(Entity_1);
           return true; // Include this row
         }
@@ -378,9 +426,7 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
 
       // change will be there
       if (addnodestemp.includes(Entity_1)) {
-       
-  
-    if (Object.keys(SingleCheckCustomer)[0] !== "N_SUPPLIER") {
+        if (Object.keys(SingleCheckCustomer)[0] !== "N_SUPPLIER") {
           if (
             row.Entity_Type_1 === "N_PURCHORDER" &&
             row.Entity_Type_2 === "N_PARTNUMBER"
@@ -395,15 +441,13 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
           }
         }
 
-
-        
         if (
-          row.Entity_Type_1 === "N_PARTNUMBER" &&
-          row.Entity_Type_2 === "N_PARTNUMBER"
+          row.Entity_Type_1 === row.Entity_Type_2
+          // row.Entity_Type_1 === "N_PARTNUMBER" &&
+          // row.Entity_Type_2 === "N_PARTNUMBER"
         ) {
-          
           if (isAscending) {
-            // downward 
+            // downward
             if (Entity_1 > Entity_2) {
               addnodes2.push(Entity_2);
               return true; // Include this row
@@ -411,16 +455,16 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
               return false;
             }
           } else {
+            // upword
 
-            // upword 
-            
             if (Entity_1 < Entity_2) {
-              
-               if( row.Entity_Type_1 === "N_SELLORDER" && row.Entity_Type_2 !== "N_PARTNUMBER"
-               ){
+              if (
+                row.Entity_Type_1 === "N_SELLORDER" &&
+                row.Entity_Type_2 !== "N_PARTNUMBER"
+              ) {
                 return false;
-               }
-                 
+              }
+
               // console.log("check " ,Entity_2 )
               addnodes2.push(Entity_2);
               return true; // Include this row
@@ -429,7 +473,6 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
             }
           }
         } else {
-
           addnodes2.push(Entity_2);
           return true; // Include this row
         }
@@ -465,249 +508,177 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
   }
 
   useEffect(() => {
+    Papa.parse(
+      "https://entertainmentbuz.com//EDGE_INTELLIGENCE/Get_merge_file.php",
+      {
+        download: true,
+        header: true,
+        complete: (result) => {
+          console.log(result.data, excludedTypes, "result.data");
 
-    Papa.parse("https://entertainmentbuz.com//EDGE_INTELLIGENCE/Get_merge_file.php", {
-      download: true,
-      header: true,
-      complete: (result) => {
-        console.log(result.data, excludedTypes, "result.data");
+          // here is the filteration of the dropdowns there
 
-        let filteredData = result.data.filter(
-          (row) =>
-            checkedEntityNames.includes(row.Entity_Type_1) &&
-            checkedEntityNames.includes(row.Entity_Type_2) &&
-            checkedEntityNames.includes(row.Edge_Type)
-        );
+          // let filteredData = result.data.filter((row) => {
+          //   return (
+          //     checkedEntityNames.includes(row.Edge_Type) &&
+          //     checkedEntityNames.includes(row.Entity_Type_1) &&
+          //     checkedEntityNames.includes(row.Entity_Type_2) &&
+          //     Object.keys(checkedDropdownItems).every((key) => {
+          //       console.log(key ,"here is the key ")
+          //       // Only apply the filter if the field exists in additionalFilters
+          //       return (
+          //         row[key] === "" || // check if row[key] is empty
+          //         checkedDropdownItems[key].includes(row[key]) // or it includes row[key]
+          //       );
+          //     })
+          //   );
+          // });
 
-        // Arrays to store main keys and sub-keys
+          // Arrays to store main keys and sub-keys
 
-        // Iterate through the main keys
+          // Iterate through the main keys
 
-        if (
-          SingleCheckCustomer.N_CUSTOMER === undefined &&
-          SingleCheckCustomer.N_PARTNUMBER === undefined &&
-          SingleCheckCustomer.N_PURCHORDER === undefined &&
-          SingleCheckCustomer.N_SELLORDER === undefined &&
-          SingleCheckCustomer.N_SUPPLIER === undefined
-        ) {
-          let nCustomer_file_filters = filterByNCustomer(filteredData);
+          // filter by dropdowns
 
-          // Initial filter and update nodes
+          if (Object.keys(SingleCheckCustomer)[0] === "") {
+            alert("check");
 
-          let filterFunctionResult = filterAndUpdateNodes(
-            nCustomer_file_filters,
-            Remove_nodes
-          );
-          while (filterFunctionResult.removeNodes2.length > 0) {
-            filterFunctionResult = filterAndUpdateNodes(
-              filterFunctionResult.filteredRows,
-              filterFunctionResult.removeNodes3
-            );
+            let filteredData = result.data.filter((row) => {
+              return (
+                checkedLinkNames.includes(row.Edge_Type) &&
+                checkedEntityNames.includes(row.Entity_Type_1) &&
+                checkedEntityNames.includes(row.Entity_Type_2) &&
+                Object.keys(checkedDropdownItems).every((key) => {
+                  console.log(key, "here is the key ");
+                  // Only apply the filter if the field exists in additionalFilters
+                  return (
+                    row[key] === "" || // check if row[key] is empty
+                    checkedDropdownItems[key].includes(row[key]) // or it includes row[key]
+                  );
+                })
+              );
+            });
+
+            processCSV(filteredData);
           }
-          let finalFilteredRows = filterFunctionResult.filteredRows;
+          // filter by id
+          else {
+            let filteredData = result.data.filter((row) => {
+              return (
+                checkedLinkNames.includes(row.Edge_Type) &&
+                checkedEntityNames.includes(row.Entity_Type_1) &&
+                checkedEntityNames.includes(row.Entity_Type_2)
+              );
+            });
 
-          // Apply additional filters and update nodes in sequence
-          // Filter by N_PARTNUMBER
-          Remove_nodes = [];
-          let N_PARTNUMBER_filter = filterByN_PARTNUMBER(finalFilteredRows);
+            const key = Object.keys(SingleCheckCustomer)[0]; // Dynamically get the key
+            if (key && SingleCheckCustomer[key] !== undefined) {
+              console.log(key, "key here is the key there ");
+              let file_filters = filterByProperty(filteredData, key);
+            }
 
-          filterFunctionResult = filterAndUpdateNodes(
-            N_PARTNUMBER_filter,
-            Remove_nodes
-          );
+            if (Object.keys(SingleCheckCustomer)[0] === "N_PARTNUMBER") {
+              add_nodes = [Object.values(SingleCheckCustomer)[0]];
+            }
 
-          while (filterFunctionResult.removeNodes2.length > 0) {
-            filterFunctionResult = filterAndUpdateNodes(
-              filterFunctionResult.filteredRows,
-              filterFunctionResult.removeNodes3
-            );
-          }
-
-          finalFilteredRows = filterFunctionResult.filteredRows;
-
-          // Filter by N_PurchOrder
-          Remove_nodes = [];
-          let filteredData_PurchOrder = filterByN_PurchOrder(finalFilteredRows);
-          filterFunctionResult = filterAndUpdateNodes(
-            filteredData_PurchOrder,
-            Remove_nodes
-          );
-
-          while (filterFunctionResult.removeNodes2.length > 0) {
-            filterFunctionResult = filterAndUpdateNodes(
-              filterFunctionResult.filteredRows,
-              filterFunctionResult.removeNodes3
-            );
-          }
-
-          finalFilteredRows = filterFunctionResult.filteredRows;
-
-          // Filter by N_Sellorder
-          Remove_nodes = [];
-          let nSellOrder_file_filter = filterByN_Sellorder(finalFilteredRows);
-          filterFunctionResult = filterAndUpdateNodes(
-            nSellOrder_file_filter,
-            Remove_nodes
-          );
-
-          while (filterFunctionResult.removeNodes2.length > 0) {
-            filterFunctionResult = filterAndUpdateNodes(
-              filterFunctionResult.filteredRows,
-              filterFunctionResult.removeNodes3
-            );
-          }
-
-          finalFilteredRows = filterFunctionResult.filteredRows;
-
-          // Filter by N_SUPPLIER
-          Remove_nodes = [];
-          let manSupplier_file_filter = filterByN_SUPPLIER(finalFilteredRows);
-          filterFunctionResult = filterAndUpdateNodes(
-            manSupplier_file_filter,
-            Remove_nodes
-          );
-
-          while (filterFunctionResult.removeNodes2.length > 0) {
-            filterFunctionResult = filterAndUpdateNodes(
-              filterFunctionResult.filteredRows,
-              filterFunctionResult.removeNodes3
-            );
-          }
-
-          finalFilteredRows = filterFunctionResult.filteredRows;
-
-          processCSV(finalFilteredRows);
-        } else {
-          if (SingleCheckCustomer.N_CUSTOMER !== undefined) {
-            let nCustomer_file_filters = filterByProperty(
+            let filterFunctionResult = filterAndUpdateNodes_input(
               filteredData,
-              "N_CUSTOMER"
+              add_nodes
             );
-          } else if (SingleCheckCustomer.N_PARTNUMBER !== undefined) {
-            let nCustomer_file_filters = filterByProperty(
+            // 1
+            filterFunctionResult = filterAndUpdateNodes_input(
               filteredData,
-              "N_PARTNUMBER"
+              filterFunctionResult.addnodes2
             );
-          } else if (SingleCheckCustomer.N_PURCHORDER !== undefined) {
-            let nCustomer_file_filters = filterByProperty(
+            // 2
+            filterFunctionResult = filterAndUpdateNodes_input(
               filteredData,
-              "N_PURCHORDER"
+              filterFunctionResult.addnodes2
             );
-          } else if (SingleCheckCustomer.N_SELLORDER !== undefined) {
-            let nCustomer_file_filters = filterByProperty(
+            // 3
+            filterFunctionResult = filterAndUpdateNodes_input(
               filteredData,
-              "N_SELLORDER"
+              filterFunctionResult.addnodes2
             );
-          } else if (SingleCheckCustomer.N_SUPPLIER !== undefined) {
-            let nCustomer_file_filters = filterByProperty(
+            // 4
+            filterFunctionResult = filterAndUpdateNodes_input(
               filteredData,
-              "N_SUPPLIER"
+              filterFunctionResult.addnodes2
             );
+            // 5
+            filterFunctionResult = filterAndUpdateNodes_input(
+              filteredData,
+              filterFunctionResult.addnodes2
+            );
+            // 6
+            filterFunctionResult = filterAndUpdateNodes_input(
+              filteredData,
+              filterFunctionResult.addnodes2
+            );
+
+            console.log("final fiter data is ", filterFunctionResult, allnodes);
+
+            let finalFilteredRows = filterFunctionResult.filteredRows;
+            console.log("allnodes", allnodes);
+            processCSV(allnodes);
           }
-            
-           if (Object.keys(SingleCheckCustomer)[0] === "N_PARTNUMBER") 
-           {
-             add_nodes = [Object.values(SingleCheckCustomer)[0]];
-           }
-              
-
-          let filterFunctionResult = filterAndUpdateNodes_input(
-            filteredData,
-            add_nodes
-          );
-// 1
-          filterFunctionResult = filterAndUpdateNodes_input(
-            filteredData,
-            filterFunctionResult.addnodes2
-          );
-// 2
-          filterFunctionResult = filterAndUpdateNodes_input(
-            filteredData,
-            filterFunctionResult.addnodes2
-          );
-// 3
-          filterFunctionResult = filterAndUpdateNodes_input(
-            filteredData,
-            filterFunctionResult.addnodes2
-          );
-// 4
-          filterFunctionResult = filterAndUpdateNodes_input(
-            filteredData,
-            filterFunctionResult.addnodes2
-          );
- // 5
-          filterFunctionResult = filterAndUpdateNodes_input(
-            filteredData,
-            filterFunctionResult.addnodes2
-          );
- // 6
-          filterFunctionResult = filterAndUpdateNodes_input(
-            filteredData,
-            filterFunctionResult.addnodes2
-          );
-
-
-
-          console.log("final fiter data is ", filterFunctionResult, allnodes);
-          let finalFilteredRows = filterFunctionResult.filteredRows;
-          console.log("allnodes", allnodes);
-          processCSV(allnodes);
-        }
-      },
-      error: (error) => {
-        console.error("Error reading CSV file:", error);
-      },
-    });
+        },
+        error: (error) => {
+          console.error("Error reading CSV file:", error);
+        },
+      }
+    );
   }, []);
-
+const shapePool = [
+  { shapeType: "sphere", geometry: new THREE.SphereGeometry(5) },
+  { shapeType: "cone", geometry: new THREE.ConeGeometry(5, 20, 3) },
+  { shapeType: "box", geometry: new THREE.BoxGeometry(10, 7, 15) },
+  { shapeType: "rectangle", geometry: new THREE.BoxGeometry(10, 5, 5) },
+  { shapeType: "cylinder", geometry: new THREE.CylinderGeometry(5, 5, 5, 40) },
+  { shapeType: "torus", geometry: new THREE.TorusGeometry(5, 2, 16, 100) },
+  { shapeType: "dodecahedron", geometry: new THREE.DodecahedronGeometry(5) },
+  { shapeType: "icosahedron", geometry: new THREE.IcosahedronGeometry(5) },
+  { shapeType: "tetrahedron", geometry: new THREE.TetrahedronGeometry(5) },
+  { shapeType: "octahedron", geometry: new THREE.OctahedronGeometry(5) }
+];
   useEffect(() => {
     const fg = fgRef.current;
     if (fg) {
       fg.d3Force("link").distance((link) => 100); // You can customize the distance
     }
-    console.log(graphData ," graphData graphData")
+    console.log(graphData, " graphData graphData");
   }, [graphData]);
 
   const getNodeColor = (node) => nodeColors[node.group] || nodeColors.default;
 
   const getLinkColor = (link) => linkColors[link.type] || linkColors.default;
 
-  const getNodeShape = (node) => {
-    const color = getNodeColor(node);
 
-    switch (node.group) {
-      case "N_CUSTOMER":
-        return new THREE.Mesh(
-          new THREE.SphereGeometry(5),
-          new THREE.MeshBasicMaterial({ color })
-        );
-      case "N_PARTNUMBER":
-        return new THREE.Mesh(
-          new THREE.ConeGeometry(5, 20, 3),
-          new THREE.MeshBasicMaterial({ color })
-        );
-      case "N_PURCHORDER":
-        return new THREE.Mesh(
-          new THREE.BoxGeometry(10, 10, 10),
-          new THREE.MeshBasicMaterial({ color })
-        );
-      case "N_SELLORDER":
-        return new THREE.Mesh(
-          new THREE.BoxGeometry(10, 5, 5),
-          new THREE.MeshBasicMaterial({ color })
-        );
-      case "N_SUPPLIER":
-        return new THREE.Mesh(
-          new THREE.CylinderGeometry(5, 5, 5, 40),
-          new THREE.MeshBasicMaterial({ color })
-        );
-      default:
-        return new THREE.Mesh(
-          new THREE.SphereGeometry(5),
-          new THREE.MeshBasicMaterial({ color })
-        );
+ // Map to store dynamically assigned shapes for each unique group
+const groupShapeMap = new Map();
+let shapeIndex = 0; // Index to track the next available shape in shapePool
+
+const getNodeShape = (node) => {
+  // If the group doesn't have a shape assigned yet, assign the next available one
+  if (!groupShapeMap.has(node.group)) {
+    if (shapeIndex < shapePool.length) {
+      groupShapeMap.set(node.group, shapePool[shapeIndex]);
+      shapeIndex++;
+    } else {
+      console.warn(`Maximum unique shape limit reached. Reusing shapes for new groups.`);
+      groupShapeMap.set(node.group, shapePool[shapeIndex % shapePool.length]);
+      shapeIndex++;
     }
-  };
+  }
+
+  // Retrieve assigned shape for the group
+  const { geometry } = groupShapeMap.get(node.group);
+  const color = getNodeColor(node); // Assuming getNodeColor is defined elsewhere
+  const material = new THREE.MeshBasicMaterial({ color });
+
+  // Return the mesh for the node
+  return new THREE.Mesh(geometry, material);
+};
 
   const renderLegend = () => (
     <>
@@ -786,7 +757,7 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
           <h4>Links</h4>
           {Object.keys(linkColors).map(
             (type) =>
-              checkedEntityNames.includes(type) && (
+              checkedLinkNames.includes(type) && (
                 <li key={type}>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <input
@@ -794,7 +765,7 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
                       type="checkbox"
                       checked={
                         !excludedTypes.includes(type) &&
-                        checkedEntityNames.includes(type)
+                        checkedLinkNames.includes(type)
                       }
                       onChange={() => handleCheckboxChange(type)}
                     />
@@ -836,198 +807,196 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
   };
 
   const applyFilters = () => {
-    Papa.parse("https://entertainmentbuz.com//EDGE_INTELLIGENCE/Get_merge_file.php", {
-      download: true,
-      header: true,
-      complete: (result) => {
-        let filteredData = result.data.filter(
-          (row) =>
-            checkedEntityNames.includes(row.Entity_Type_1) &&
-            checkedEntityNames.includes(row.Entity_Type_1) &&
-            checkedEntityNames.includes(row.Edge_Type)
-        );
-
-        const filteredData2 = filteredData.filter(
-          (row) =>
-            !excludedTypes.includes(row.Entity_Type_1) &&
-            !excludedTypes.includes(row.Entity_Type_2) &&
-            !excludedTypes.includes(row.Edge_Type)
-        );
-
-        // Iterate through the main keys
-
-        if (
-          SingleCheckCustomer.N_CUSTOMER === undefined &&
-          SingleCheckCustomer.N_PARTNUMBER === undefined &&
-          SingleCheckCustomer.N_PURCHORDER === undefined &&
-          SingleCheckCustomer.N_SELLORDER === undefined &&
-          SingleCheckCustomer.N_SUPPLIER === undefined
-        ) {
-          let nCustomer_file_filters = filterByNCustomer(filteredData2);
-
-          // Initial filter and update nodes
-
-          let filterFunctionResult = filterAndUpdateNodes(
-            nCustomer_file_filters,
-            Remove_nodes
+    Papa.parse(
+      "https://entertainmentbuz.com//EDGE_INTELLIGENCE/Get_merge_file.php",
+      {
+        download: true,
+        header: true,
+        complete: (result) => {
+          let filteredData = result.data.filter(
+            (row) =>
+              checkedEntityNames.includes(row.Entity_Type_1) &&
+              checkedEntityNames.includes(row.Entity_Type_1) &&
+              checkedLinkNames.includes(row.Edge_Type)
           );
-          while (filterFunctionResult.removeNodes2.length > 0) {
+
+          const filteredData2 = filteredData.filter(
+            (row) =>
+              !excludedTypes.includes(row.Entity_Type_1) &&
+              !excludedTypes.includes(row.Entity_Type_2) &&
+              !excludedTypes.includes(row.Edge_Type)
+          );
+
+          // Iterate through the main keys
+
+          if (
+            SingleCheckCustomer.N_CUSTOMER === undefined &&
+            SingleCheckCustomer.N_PARTNUMBER === undefined &&
+            SingleCheckCustomer.N_PURCHORDER === undefined &&
+            SingleCheckCustomer.N_SELLORDER === undefined &&
+            SingleCheckCustomer.N_SUPPLIER === undefined
+          ) {
+            let nCustomer_file_filters = filterByNCustomer(filteredData2);
+
+            // Initial filter and update nodes
+
+            let filterFunctionResult = filterAndUpdateNodes(
+              nCustomer_file_filters,
+              Remove_nodes
+            );
+            while (filterFunctionResult.removeNodes2.length > 0) {
+              filterFunctionResult = filterAndUpdateNodes(
+                filterFunctionResult.filteredRows,
+                filterFunctionResult.removeNodes3
+              );
+            }
+            let finalFilteredRows = filterFunctionResult.filteredRows;
+
+            // Apply additional filters and update nodes in sequence
+            // Filter by N_PARTNUMBER
+            Remove_nodes = [];
+            let N_PARTNUMBER_filter = filterByN_PARTNUMBER(finalFilteredRows);
+
             filterFunctionResult = filterAndUpdateNodes(
-              filterFunctionResult.filteredRows,
-              filterFunctionResult.removeNodes3
+              N_PARTNUMBER_filter,
+              Remove_nodes
             );
-          }
-          let finalFilteredRows = filterFunctionResult.filteredRows;
 
-          // Apply additional filters and update nodes in sequence
-          // Filter by N_PARTNUMBER
-          Remove_nodes = [];
-          let N_PARTNUMBER_filter = filterByN_PARTNUMBER(finalFilteredRows);
+            while (filterFunctionResult.removeNodes2.length > 0) {
+              filterFunctionResult = filterAndUpdateNodes(
+                filterFunctionResult.filteredRows,
+                filterFunctionResult.removeNodes3
+              );
+            }
 
-          filterFunctionResult = filterAndUpdateNodes(
-            N_PARTNUMBER_filter,
-            Remove_nodes
-          );
+            finalFilteredRows = filterFunctionResult.filteredRows;
 
-          while (filterFunctionResult.removeNodes2.length > 0) {
+            // Filter by N_PurchOrder
+            Remove_nodes = [];
+            let filteredData_PurchOrder =
+              filterByN_PurchOrder(finalFilteredRows);
             filterFunctionResult = filterAndUpdateNodes(
-              filterFunctionResult.filteredRows,
-              filterFunctionResult.removeNodes3
+              filteredData_PurchOrder,
+              Remove_nodes
             );
-          }
 
-          finalFilteredRows = filterFunctionResult.filteredRows;
+            while (filterFunctionResult.removeNodes2.length > 0) {
+              filterFunctionResult = filterAndUpdateNodes(
+                filterFunctionResult.filteredRows,
+                filterFunctionResult.removeNodes3
+              );
+            }
 
-          // Filter by N_PurchOrder
-          Remove_nodes = [];
-          let filteredData_PurchOrder = filterByN_PurchOrder(finalFilteredRows);
-          filterFunctionResult = filterAndUpdateNodes(
-            filteredData_PurchOrder,
-            Remove_nodes
-          );
+            finalFilteredRows = filterFunctionResult.filteredRows;
 
-          while (filterFunctionResult.removeNodes2.length > 0) {
+            // Filter by N_Sellorder
+            Remove_nodes = [];
+            let nSellOrder_file_filter = filterByN_Sellorder(finalFilteredRows);
             filterFunctionResult = filterAndUpdateNodes(
-              filterFunctionResult.filteredRows,
-              filterFunctionResult.removeNodes3
+              nSellOrder_file_filter,
+              Remove_nodes
             );
-          }
 
-          finalFilteredRows = filterFunctionResult.filteredRows;
+            while (filterFunctionResult.removeNodes2.length > 0) {
+              filterFunctionResult = filterAndUpdateNodes(
+                filterFunctionResult.filteredRows,
+                filterFunctionResult.removeNodes3
+              );
+            }
 
-          // Filter by N_Sellorder
-          Remove_nodes = [];
-          let nSellOrder_file_filter = filterByN_Sellorder(finalFilteredRows);
-          filterFunctionResult = filterAndUpdateNodes(
-            nSellOrder_file_filter,
-            Remove_nodes
-          );
+            finalFilteredRows = filterFunctionResult.filteredRows;
 
-          while (filterFunctionResult.removeNodes2.length > 0) {
+            // Filter by N_SUPPLIER
+            Remove_nodes = [];
+            let manSupplier_file_filter = filterByN_SUPPLIER(finalFilteredRows);
             filterFunctionResult = filterAndUpdateNodes(
-              filterFunctionResult.filteredRows,
-              filterFunctionResult.removeNodes3
+              manSupplier_file_filter,
+              Remove_nodes
             );
+
+            while (filterFunctionResult.removeNodes2.length > 0) {
+              filterFunctionResult = filterAndUpdateNodes(
+                filterFunctionResult.filteredRows,
+                filterFunctionResult.removeNodes3
+              );
+            }
+
+            finalFilteredRows = filterFunctionResult.filteredRows;
+            console.log("allnodes", allnodes);
+            processCSV(finalFilteredRows);
+          } else {
+            if (SingleCheckCustomer.N_CUSTOMER !== undefined) {
+              let nCustomer_file_filters = filterByProperty(
+                filteredData2,
+                "N_CUSTOMER"
+              );
+            } else if (SingleCheckCustomer.N_PARTNUMBER !== undefined) {
+              let nCustomer_file_filters = filterByProperty(
+                filteredData2,
+                "N_PARTNUMBER"
+              );
+            } else if (SingleCheckCustomer.N_PURCHORDER !== undefined) {
+              let nCustomer_file_filters = filterByProperty(
+                filteredData2,
+                "N_PURCHORDER"
+              );
+            } else if (SingleCheckCustomer.N_SELLORDER !== undefined) {
+              let nCustomer_file_filters = filterByProperty(
+                filteredData2,
+                "N_SELLORDER"
+              );
+            } else if (SingleCheckCustomer.N_SUPPLIER !== undefined) {
+              let nCustomer_file_filters = filterByProperty(
+                filteredData2,
+                "N_SUPPLIER"
+              );
+            }
+
+            let filterFunctionResult = filterAndUpdateNodes_input(
+              filteredData2,
+              add_nodes
+            );
+            // 1
+            filterFunctionResult = filterAndUpdateNodes_input(
+              filteredData,
+              filterFunctionResult.addnodes2
+            );
+            // 2
+            filterFunctionResult = filterAndUpdateNodes_input(
+              filteredData,
+              filterFunctionResult.addnodes2
+            );
+            // 3
+            filterFunctionResult = filterAndUpdateNodes_input(
+              filteredData,
+              filterFunctionResult.addnodes2
+            );
+            // 4
+            filterFunctionResult = filterAndUpdateNodes_input(
+              filteredData,
+              filterFunctionResult.addnodes2
+            );
+            // 5
+            filterFunctionResult = filterAndUpdateNodes_input(
+              filteredData,
+              filterFunctionResult.addnodes2
+            );
+            // 6
+            filterFunctionResult = filterAndUpdateNodes_input(
+              filteredData,
+              filterFunctionResult.addnodes2
+            );
+
+            let finalFilteredRows = filterFunctionResult.filteredRows;
+            console.log("allnodes", allnodes);
+            processCSV(allnodes);
           }
-
-          finalFilteredRows = filterFunctionResult.filteredRows;
-
-          // Filter by N_SUPPLIER
-          Remove_nodes = [];
-          let manSupplier_file_filter = filterByN_SUPPLIER(finalFilteredRows);
-          filterFunctionResult = filterAndUpdateNodes(
-            manSupplier_file_filter,
-            Remove_nodes
-          );
-
-          while (filterFunctionResult.removeNodes2.length > 0) {
-            filterFunctionResult = filterAndUpdateNodes(
-              filterFunctionResult.filteredRows,
-              filterFunctionResult.removeNodes3
-            );
-          }
-
-          finalFilteredRows = filterFunctionResult.filteredRows;
-          console.log("allnodes", allnodes);
-          processCSV(finalFilteredRows);
-        } else {
-          if (SingleCheckCustomer.N_CUSTOMER !== undefined) {
-            let nCustomer_file_filters = filterByProperty(
-              filteredData2,
-              "N_CUSTOMER"
-            );
-          } else if (SingleCheckCustomer.N_PARTNUMBER !== undefined) {
-            let nCustomer_file_filters = filterByProperty(
-              filteredData2,
-              "N_PARTNUMBER"
-            );
-          } else if (SingleCheckCustomer.N_PURCHORDER !== undefined) {
-            let nCustomer_file_filters = filterByProperty(
-              filteredData2,
-              "N_PURCHORDER"
-            );
-          } else if (SingleCheckCustomer.N_SELLORDER !== undefined) {
-            let nCustomer_file_filters = filterByProperty(
-              filteredData2,
-              "N_SELLORDER"
-            );
-          } else if (SingleCheckCustomer.N_SUPPLIER !== undefined) {
-            let nCustomer_file_filters = filterByProperty(
-              filteredData2,
-              "N_SUPPLIER"
-            );
-          }
-
-          let filterFunctionResult = filterAndUpdateNodes_input(
-            filteredData2,
-            add_nodes
-          );
-     // 1
-     filterFunctionResult = filterAndUpdateNodes_input(
-      filteredData,
-      filterFunctionResult.addnodes2
+        },
+        error: (error) => {
+          console.error("Error reading CSV file:", error);
+        },
+      }
     );
-// 2
-    filterFunctionResult = filterAndUpdateNodes_input(
-      filteredData,
-      filterFunctionResult.addnodes2
-    );
-// 3
-    filterFunctionResult = filterAndUpdateNodes_input(
-      filteredData,
-      filterFunctionResult.addnodes2
-    );
-// 4
-    filterFunctionResult = filterAndUpdateNodes_input(
-      filteredData,
-      filterFunctionResult.addnodes2
-    );
-// 5
-    filterFunctionResult = filterAndUpdateNodes_input(
-      filteredData,
-      filterFunctionResult.addnodes2
-    );
-// 6
-    filterFunctionResult = filterAndUpdateNodes_input(
-      filteredData,
-      filterFunctionResult.addnodes2
-    );
-
-         
-
-
-
-
-
-          let finalFilteredRows = filterFunctionResult.filteredRows;
-          console.log("allnodes", allnodes);
-          processCSV(allnodes);
-        }
-      },
-      error: (error) => {
-        console.error("Error reading CSV file:", error);
-      },
-    });
   };
 
   const handleLegendClick = (type, x, y) => {
@@ -1102,7 +1071,6 @@ console.log(SingleCheckCustomer ,"SingleCheckCustomer")
                     onClick={() => handleColorSelect(color)}
                   />
                 ))}
-                <button>Back</button>
               </div>
             )}
             {tooltip.visible && (

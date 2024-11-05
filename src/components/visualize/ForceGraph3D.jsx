@@ -32,8 +32,7 @@ const Visualize_filteration = () => {
   const [entityHeaders, setEntityHeaders] = useState({});
   const [linkHeaders, setLinkHeaders] = useState({});
   const [entityData, setEnitityData] = useState({});
-
-  const [checkedEntities, setCheckedEntities] = useState({});
+ const [checkedEntities, setCheckedEntities] = useState({});
   const [checkedLinks, setCheckedLinks] = useState({});
 
   const [checkedEntityNames, setCheckedEntityNames] = useState([]);
@@ -44,8 +43,9 @@ const Visualize_filteration = () => {
   const [inputValue, setInputValue] = useState("");
   const [inputData, setInputData] = useState({});
 
+  const [sameType, setsameType] = useState('');
   const [isAscending, setIsAscending] = useState(false);
-
+console.log(checkedDropdownItems , "here from its send to the next page there ")
   const handleUpArrowClick = () => {
     setIsAscending(true);
   };
@@ -110,6 +110,29 @@ console.log(newLinkHeaders ,newLinkHeaders ,"newLinkHeaders")
           "https://entertainmentbuz.com/EDGE_INTELLIGENCE/get_nodes_edges_csv.php?type=link-files"
         );
 
+        const url = 'https://entertainmentbuz.com/EDGE_INTELLIGENCE/get_type_equality.php?check=check';
+
+        // Fetch the result from the PHP script
+        fetch(url)
+            .then(response => response.text()) // Get the response as text
+            .then(data => {
+                // Save the result to state
+               console.log(data ,"here is the response of the data there  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+               setsameType(data) ; 
+           
+              })
+            .catch(error => {
+                console.error('Error fetching c sdadasdasdasdasdasd as das das das asdas data:', error);
+            });
+       
+        // const typeReturn = await fetch("https://entertainmentbuz.com/EDGE_INTELLIGENCE/get_type_equality.php?check=check");
+
+    
+
+
+
+
+// console.log(typeReturn , "typeReturn typeReturn typeReturn typeReturn")
         if (!entityResponse.ok || !linkResponse.ok) {
           throw new Error("Failed to fetch files from the backend");
         }
@@ -230,16 +253,35 @@ const getLinkName = (filePath) => {
       [filePath]: !prevState[filePath],
     }));
   };
+  function flattenArrays(data) {
+    const result = {};
+
+    for (const section of Object.values(data)) {
+        if (typeof section === "object" && section !== null) {
+            for (const [key, value] of Object.entries(section)) {
+                // Check if the value is an array and has values
+                if (Array.isArray(value) && value.length > 0) {
+                    result[key] = value;
+                }
+            }
+        }
+    }
+
+    return result;
+}
+let arrays 
   const handleEntityData = (filePath, header, item) => {
     const entityName = getEntityName(filePath);
 
     // Get the current state of the dropdown items for the specific entity and header
     const currentItems = checkedDropdownItems[entityName]?.[header] || [];
-
     // Determine if the item should be added or removed
     const newItems = currentItems.includes(item)
-      ? currentItems.filter((i) => i !== item)
-      : [...currentItems, item];
+    ? currentItems.filter((i) => i !== item)
+    : [...currentItems, item];
+
+
+
 
     // Create the updated checked items structure, including the customerId
     const newCheckedItems = {
@@ -249,8 +291,28 @@ const getLinkName = (filePath) => {
         [header]: newItems, // Add or update the customerId
       },
     };
-
-    setCheckedDropdownItems(newCheckedItems);
+    
+   
+       arrays = flattenArrays(newCheckedItems)
+      console.log(arrays , "arrays are there ")
+      setCheckedDropdownItems((prevState) => {
+        const updatedState = { ...prevState };
+    
+        // Loop through each key in `arrays` to merge values into `prevState`
+        for (const key in arrays) {
+            if (Array.isArray(arrays[key])) {
+                // Combine existing items in the state with new ones from `arrays`, removing duplicates
+                updatedState[key] = [
+                    ...(updatedState[key] || []),
+                    ...arrays[key].filter(item => !(updatedState[key] || []).includes(item))
+                ];
+            } else {
+                // In case of non-array values, just set them (if required in your case)
+                updatedState[key] = arrays[key];
+            }
+        }
+        return updatedState;
+    });
 
     if (!checkedEntityNames.includes(entityName)) {
       setCheckedEntityNames([...checkedEntityNames, entityName]);
@@ -285,15 +347,15 @@ const getLinkName = (filePath) => {
     });
 
     // Toggle checkedEntityNames
-    setCheckedEntityNames((prevNames) => {
-      if (prevNames.includes(linkName)) {
-        // If the entity is already checked, remove it
-        return prevNames.filter((name) => name !== linkName);
-      } else {
-        // If the entity is not checked, add it
-        return [...prevNames, linkName];
-      }
-    });
+    // setCheckedEntityNames((prevNames) => {
+    //   if (prevNames.includes(linkName)) {
+    //     // If the entity is already checked, remove it
+    //     return prevNames.filter((name) => name !== linkName);
+    //   } else {
+    //     // If the entity is not checked, add it
+    //     return [...prevNames, linkName];
+    //   }
+    // });
   };
 
   // const handleInputData = () => {
@@ -522,7 +584,7 @@ const getLinkName = (filePath) => {
                                         />
                                         <span className="entity-text">
                                           {entityName}
-                                          {entityName === "N_PARTNUMBER" && (
+                                          {entityName === sameType  && (
                                             <>
                                               <button
                                                 className={`arrow-button ${
@@ -602,7 +664,7 @@ const getLinkName = (filePath) => {
                               checkedLinkNames,
                               checkedDropdownItems,
                               inputData,
-                              isAscending,
+                              isAscending, arrays
                             },
                           }); // You can adjust the delay time if necessary
                         }
