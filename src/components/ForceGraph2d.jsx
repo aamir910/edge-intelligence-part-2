@@ -21,6 +21,7 @@ import { useLocation } from "react-router-dom";
 const customerImage = "customer.png"; // Replace with the actual path to the customer image
 
 const ForceGraph2DComponent = () => {
+
   const location = useLocation();
 
   // Check if location.state exists before accessing its properties
@@ -39,6 +40,8 @@ const ForceGraph2DComponent = () => {
 
   const fgRef = useRef();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
+
+  const [loading, setLoading] = useState(false);
 
   const getRepeatingNodes = (nodes) => {
     const seenIds = new Set();
@@ -508,6 +511,9 @@ const ForceGraph2DComponent = () => {
   }
 
   useEffect(() => {
+   // Set loading to true at the start of data parsing
+   setLoading(true);
+
     Papa.parse(
       "https://entertainmentbuz.com//EDGE_INTELLIGENCE/Get_merge_file.php",
       {
@@ -616,14 +622,19 @@ const ForceGraph2DComponent = () => {
             );
 
             console.log("final fiter data is ", filterFunctionResult, allnodes);
-
+         
             let finalFilteredRows = filterFunctionResult.filteredRows;
             console.log("allnodes", allnodes);
             processCSV(allnodes);
+              // Set loading to false after processing is complete
+        
           }
+          setLoading(false);
         },
         error: (error) => {
           console.error("Error reading CSV file:", error);
+            // Set loading to false after processing is complete
+        setLoading(false);
         },
       }
     );
@@ -681,7 +692,6 @@ const getNodeShape = (node) => {
 
   const renderLegend = () => (
     <>
-      <Navbar image="newedgeintelligence.png" color="white" />
       <div className="legend">
         <ul>
           <div class="container">
@@ -812,12 +822,7 @@ const getNodeShape = (node) => {
         download: true,
         header: true,
         complete: (result) => {
-          let filteredData = result.data.filter(
-            (row) =>
-              checkedEntityNames.includes(row.Entity_Type_1) &&
-              checkedEntityNames.includes(row.Entity_Type_1) &&
-              checkedLinkNames.includes(row.Edge_Type)
-          );
+      
 
           const filteredData2 = filteredData.filter(
             (row) =>
@@ -826,133 +831,54 @@ const getNodeShape = (node) => {
               !excludedTypes.includes(row.Edge_Type)
           );
 
-          // Iterate through the main keys
-
-          if (
-            SingleCheckCustomer.N_CUSTOMER === undefined &&
-            SingleCheckCustomer.N_PARTNUMBER === undefined &&
-            SingleCheckCustomer.N_PURCHORDER === undefined &&
-            SingleCheckCustomer.N_SELLORDER === undefined &&
-            SingleCheckCustomer.N_SUPPLIER === undefined
-          ) {
-            let nCustomer_file_filters = filterByNCustomer(filteredData2);
-
-            // Initial filter and update nodes
-
-            let filterFunctionResult = filterAndUpdateNodes(
-              nCustomer_file_filters,
-              Remove_nodes
-            );
-            while (filterFunctionResult.removeNodes2.length > 0) {
-              filterFunctionResult = filterAndUpdateNodes(
-                filterFunctionResult.filteredRows,
-                filterFunctionResult.removeNodes3
+          if (Object.keys(SingleCheckCustomer)[0] === "") {
+         
+            let filteredData = result.data.filter((row) => {
+              return (
+                checkedLinkNames.includes(row.Edge_Type) &&
+                checkedEntityNames.includes(row.Entity_Type_1) &&
+                checkedEntityNames.includes(row.Entity_Type_2) &&
+                !excludedTypes.includes(row.Entity_Type_1) &&
+                !excludedTypes.includes(row.Entity_Type_2) &&
+                !excludedTypes.includes(row.Edge_Type) &&
+                Object.keys(checkedDropdownItems).every((key) => {
+                  console.log(key, "here is the key ");
+                  // Only apply the filter if the field exists in additionalFilters
+                  return (
+                    row[key] === "" || // check if row[key] is empty
+                    checkedDropdownItems[key].includes(row[key]) // or it includes row[key]
+                  );
+                })
               );
-            }
-            let finalFilteredRows = filterFunctionResult.filteredRows;
+            });
 
-            // Apply additional filters and update nodes in sequence
-            // Filter by N_PARTNUMBER
-            Remove_nodes = [];
-            let N_PARTNUMBER_filter = filterByN_PARTNUMBER(finalFilteredRows);
-
-            filterFunctionResult = filterAndUpdateNodes(
-              N_PARTNUMBER_filter,
-              Remove_nodes
-            );
-
-            while (filterFunctionResult.removeNodes2.length > 0) {
-              filterFunctionResult = filterAndUpdateNodes(
-                filterFunctionResult.filteredRows,
-                filterFunctionResult.removeNodes3
+            processCSV(filteredData);
+          }
+          // filter by id
+          else {
+            let filteredData = result.data.filter((row) => {
+              return (
+                checkedLinkNames.includes(row.Edge_Type) &&
+                checkedEntityNames.includes(row.Entity_Type_1) &&
+                checkedEntityNames.includes(row.Entity_Type_2) &&  
+                !excludedTypes.includes(row.Entity_Type_1) &&
+                !excludedTypes.includes(row.Entity_Type_2) &&
+                !excludedTypes.includes(row.Edge_Type) 
               );
-            }
+            });
 
-            finalFilteredRows = filterFunctionResult.filteredRows;
-
-            // Filter by N_PurchOrder
-            Remove_nodes = [];
-            let filteredData_PurchOrder =
-              filterByN_PurchOrder(finalFilteredRows);
-            filterFunctionResult = filterAndUpdateNodes(
-              filteredData_PurchOrder,
-              Remove_nodes
-            );
-
-            while (filterFunctionResult.removeNodes2.length > 0) {
-              filterFunctionResult = filterAndUpdateNodes(
-                filterFunctionResult.filteredRows,
-                filterFunctionResult.removeNodes3
-              );
+            const key = Object.keys(SingleCheckCustomer)[0]; // Dynamically get the key
+            if (key && SingleCheckCustomer[key] !== undefined) {
+              console.log(key, "key here is the key there ");
+              let file_filters = filterByProperty(filteredData, key);
             }
 
-            finalFilteredRows = filterFunctionResult.filteredRows;
-
-            // Filter by N_Sellorder
-            Remove_nodes = [];
-            let nSellOrder_file_filter = filterByN_Sellorder(finalFilteredRows);
-            filterFunctionResult = filterAndUpdateNodes(
-              nSellOrder_file_filter,
-              Remove_nodes
-            );
-
-            while (filterFunctionResult.removeNodes2.length > 0) {
-              filterFunctionResult = filterAndUpdateNodes(
-                filterFunctionResult.filteredRows,
-                filterFunctionResult.removeNodes3
-              );
-            }
-
-            finalFilteredRows = filterFunctionResult.filteredRows;
-
-            // Filter by N_SUPPLIER
-            Remove_nodes = [];
-            let manSupplier_file_filter = filterByN_SUPPLIER(finalFilteredRows);
-            filterFunctionResult = filterAndUpdateNodes(
-              manSupplier_file_filter,
-              Remove_nodes
-            );
-
-            while (filterFunctionResult.removeNodes2.length > 0) {
-              filterFunctionResult = filterAndUpdateNodes(
-                filterFunctionResult.filteredRows,
-                filterFunctionResult.removeNodes3
-              );
-            }
-
-            finalFilteredRows = filterFunctionResult.filteredRows;
-            console.log("allnodes", allnodes);
-            processCSV(finalFilteredRows);
-          } else {
-            if (SingleCheckCustomer.N_CUSTOMER !== undefined) {
-              let nCustomer_file_filters = filterByProperty(
-                filteredData2,
-                "N_CUSTOMER"
-              );
-            } else if (SingleCheckCustomer.N_PARTNUMBER !== undefined) {
-              let nCustomer_file_filters = filterByProperty(
-                filteredData2,
-                "N_PARTNUMBER"
-              );
-            } else if (SingleCheckCustomer.N_PURCHORDER !== undefined) {
-              let nCustomer_file_filters = filterByProperty(
-                filteredData2,
-                "N_PURCHORDER"
-              );
-            } else if (SingleCheckCustomer.N_SELLORDER !== undefined) {
-              let nCustomer_file_filters = filterByProperty(
-                filteredData2,
-                "N_SELLORDER"
-              );
-            } else if (SingleCheckCustomer.N_SUPPLIER !== undefined) {
-              let nCustomer_file_filters = filterByProperty(
-                filteredData2,
-                "N_SUPPLIER"
-              );
+            if (Object.keys(SingleCheckCustomer)[0] === "N_PARTNUMBER") {
+              add_nodes = [Object.values(SingleCheckCustomer)[0]];
             }
 
             let filterFunctionResult = filterAndUpdateNodes_input(
-              filteredData2,
+              filteredData,
               add_nodes
             );
             // 1
@@ -985,6 +911,8 @@ const getNodeShape = (node) => {
               filteredData,
               filterFunctionResult.addnodes2
             );
+
+            console.log("final fiter data is ", filterFunctionResult, allnodes);
 
             let finalFilteredRows = filterFunctionResult.filteredRows;
             console.log("allnodes", allnodes);
@@ -1040,76 +968,98 @@ const getNodeShape = (node) => {
 
   return (
     <>
-      <div className="container1 ">
-        <div className="row graph_legend">
-          <div
-            className="col-2 legend_main_box"
-            style={{ zIndex: 999, marginTop: "55px", background: "black" }}>
-            {renderLegend()}
-            {colorPicker.visible && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: colorPicker.y,
-                  left: colorPicker.x,
-                  backgroundColor: "black",
-                  border: "1px solid white",
-                  padding: "10px",
-                  zIndex: 1000,
-                }}>
-                {predefinedColors.map((color) => (
-                  <div
-                    key={color}
-                    style={{
-                      backgroundColor: color,
-                      width: "20px",
-                      height: "20px",
-                      margin: "5px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleColorSelect(color)}
-                  />
-                ))}
-              </div>
-            )}
-            {tooltip.visible && (
-              <div
-                className="tooltip1"
-                style={{
-                  position: "absolute",
-                  top: tooltip.y,
-                  left: tooltip.x,
-                  backgroundColor: "white",
-                  border: "1px solid black",
-                  padding: "5px",
-                  pointerEvents: "none",
-                  zIndex: 1000,
-                }}>
-                {tooltip.content}
-              </div>
-            )}
-          </div>
+    
+    <Navbar image="newedgeintelligence.png" color="white" />
+    {loading ? 
+     <div
+     style={{
+       display: 'flex',
+       alignItems: 'center',
+       justifyContent: 'center',
+       backgroundColor: 'white',
+       width: '100vw',
+       height: '100vh',
+     }}
+   >
 
-          <div className="col-8">
-            <div className="graph-container">
-              <ForceGraph3D
-                ref={fgRef}
-                nodeRelSize={8}
-                graphData={graphData}
-                nodeLabel={(node) => `${node.id}`}
-                nodeAutoColorBy="group"
-                backgroundColor="black"
-                linkColor={getLinkColor}
-                nodeColor={getNodeColor}
-                linkWidth={3}
-                enableZoomInteraction={true}
-                nodeThreeObject={getNodeShape}
-                onNodeHover={handleNodeHover}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+     <Spin spinning={loading} tip="Loading...">
+            <div>    LOADING    
+                       </div>
+     </Spin>
+   </div> :
+   <div className="container1 ">
+   <div className="row graph_legend">
+     <div
+       className="col-2 legend_main_box"
+       style={{ zIndex: 999, marginTop: "55px", background: "black" }}>
+       {renderLegend()}
+       {colorPicker.visible && (
+         <div
+           style={{
+             position: "absolute",
+             top: colorPicker.y,
+             left: colorPicker.x,
+             backgroundColor: "black",
+             border: "1px solid white",
+             padding: "10px",
+             zIndex: 1000,
+           }}>
+           {predefinedColors.map((color) => (
+             <div
+               key={color}
+               style={{
+                 backgroundColor: color,
+                 width: "20px",
+                 height: "20px",
+                 margin: "5px",
+                 cursor: "pointer",
+               }}
+               onClick={() => handleColorSelect(color)}
+             />
+           ))}
+         </div>
+       )}
+       {tooltip.visible && (
+         <div
+           className="tooltip1"
+           style={{
+             position: "absolute",
+             top: tooltip.y,
+             left: tooltip.x,
+             backgroundColor: "white",
+             border: "1px solid black",
+             padding: "5px",
+             pointerEvents: "none",
+             zIndex: 1000,
+           }}>
+           {tooltip.content}
+         </div>
+       )}
+     </div>
+
+     <div className="col-8">
+       <div className="graph-container">
+         <ForceGraph3D
+           ref={fgRef}
+           nodeRelSize={8}
+           graphData={graphData}
+           nodeLabel={(node) => `${node.id}`}
+           nodeAutoColorBy="group"
+           backgroundColor="black"
+           linkColor={getLinkColor}
+           nodeColor={getNodeColor}
+           linkWidth={3}
+           enableZoomInteraction={true}
+           nodeThreeObject={getNodeShape}
+           onNodeHover={handleNodeHover}
+         />
+       </div>
+     </div>
+   </div>
+ </div>
+   }
+       
+
     </>
   );
 };
