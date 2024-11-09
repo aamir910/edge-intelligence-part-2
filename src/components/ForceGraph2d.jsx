@@ -220,101 +220,6 @@ const ForceGraph2DComponent = () => {
     return filteredData;
   }
 
-  function filterByN_PARTNUMBER(data) {
-    const filteredData = data.filter((item) => {
-      const matchesCustomer =
-        SingleCheckCustomer.N_CUSTOMER === undefined ||
-        SingleCheckCustomer.N_CUSTOMER === item.Entity_1 ||
-        SingleCheckCustomer.N_CUSTOMER === item.Entity_2 ||
-        SingleCheckCustomer.N_CUSTOMER === "";
-
-      const matchesClass =
-        !item.CLASS ||
-        nPartNumber.CLASS === undefined ||
-        nPartNumber.CLASS.includes(item.CLASS) ||
-        item.CLASS === "";
-      const matchesMOB =
-        !item.MOB ||
-        nPartNumber.MOB === undefined ||
-        nPartNumber.MOB.includes(item.MOB) ||
-        item.MOB === "";
-      const matchesUM =
-        !item.UM ||
-        nPartNumber.UM === undefined ||
-        nPartNumber.UM.includes(item.UM) ||
-        item.UM === "";
-      const matchesDept =
-        !item.DEPT ||
-        nPartNumber.DEPT === undefined ||
-        nPartNumber.DEPT.includes(item.DEPT) ||
-        item.DEPT === "";
-      const matchesWOCE =
-        !item.WOCE ||
-        nPartNumber.WOCE === undefined ||
-        nPartNumber.WOCE.includes(item.WOCE) ||
-        item.WOCE === "";
-      const matchesBOMLEV =
-        !item.BOMLEV ||
-        nPartNumber.BOMLEV === undefined ||
-        nPartNumber.BOMLEV.includes(item.BOMLEV) ||
-        item.BOMLEV === "";
-      const matchesFAMILY =
-        !item.FAMILY ||
-        nPartNumber.FAMILY === undefined ||
-        nPartNumber.FAMILY.includes(item.FAMILY) ||
-        item.FAMILY === "";
-
-      if (!matchesClass && item.CLASS !== "")
-        Remove_nodes.push(item.Entity_1, item.Entity_2);
-      if (!matchesMOB && item.MOB !== "")
-        Remove_nodes.push(item.Entity_1, item.Entity_2);
-      if (!matchesUM && item.UM !== "")
-        Remove_nodes.push(item.Entity_1, item.Entity_2);
-      if (!matchesDept && item.DEPT !== "")
-        Remove_nodes.push(item.Entity_1, item.Entity_2);
-      if (!matchesWOCE && item.WOCE !== "")
-        Remove_nodes.push(item.Entity_1, item.Entity_2);
-      if (!matchesBOMLEV && item.BOMLEV !== "")
-        Remove_nodes.push(item.Entity_1, item.Entity_2);
-      if (!matchesFAMILY && item.FAMILY !== "")
-        Remove_nodes.push(item.Entity_1, item.Entity_2);
-
-      return (
-        matchesCustomer &&
-        matchesClass &&
-        matchesMOB &&
-        matchesUM &&
-        matchesDept &&
-        matchesWOCE &&
-        matchesBOMLEV &&
-        matchesFAMILY
-      );
-    });
-
-    // Optionally, remove duplicates from Remove_nodes
-    // Remove_nodes = [...new Set(Remove_nodes)];
-
-    return filteredData;
-  }
-
-  function filterByN_PurchOrder(data) {
-    const filteredData = data.filter((item) => {
-      const matchesPurchOrderType =
-        !item.PURCH_ORDER_TYPE ||
-        nPurchOrder.PURCH_ORDER_TYPE === undefined ||
-        nPurchOrder.PURCH_ORDER_TYPE.includes(item.PURCH_ORDER_TYPE) ||
-        item.PURCH_ORDER_TYPE === "";
-
-      // Add entities to Remove_nodes if they don't match criteria
-      if (!matchesPurchOrderType && item.PURCH_ORDER_TYPE !== "") {
-        Remove_nodes.push(item.Entity_1, item.Entity_2);
-      }
-
-      return matchesPurchOrderType;
-    });
-
-    return filteredData;
-  }
 
   let Remove_nodes = [];
   function filterByN_Sellorder(data) {
@@ -357,6 +262,9 @@ const ForceGraph2DComponent = () => {
 
   let removeNodes3 = [];
 
+  let flag = true   ; 
+ let lastNode_enitity1 = [] ;
+ let lastNode_enitity2 = [] ;
   function filterAndUpdateNodes(data, removeNodes) {
     let removeNodes2 = [];
     const filteredRows = data.filter((row) => {
@@ -382,26 +290,12 @@ const ForceGraph2DComponent = () => {
 
     const filteredRows = data.filter((row, key) => {
       const { Entity_1, Entity_2 } = row;
-
       if (addnodestemp.includes(Entity_2)) {
-        // if (
-        //   row.Entity_Type_1 === "N_PARTNUMBER" &&
-        //   row.Entity_Type_2 === "N_PARTNUMBER"
-        // ) {
-
+   
         if (
           row.Entity_Type_1 === row.Entity_Type_2
-          // false
         ) {
-          // if (addnodestemp.includes(Entity_1)) {
-          //   if (Entity_1 > Entity_2) {
-          //     addnodes2.push(Entity_1);
-          //     return true; // Include this row
-          //   } else {
-          //     return false;
-          //   }
-          // }
-
+         
           if (isAscending) {
             if (addnodestemp.includes(Entity_2)) {
               if (Entity_1 < Entity_2) {
@@ -422,12 +316,30 @@ const ForceGraph2DComponent = () => {
             }
           }
         } else {
-          addnodes2.push(Entity_1);
-          return true; // Include this row
+          
+          if(flag){
+            flag =false ; 
+            addnodes2.push(Entity_1);
+            lastNode_enitity2.push(`${row.Entity_Type_1}-${row.Entity_Type_2}`)
+
+            console.log(lastNode_enitity2 ,'lastNode lastNode lastNode ')
+
+            return true; 
+          }
+          else if ( !lastNode_enitity1.includes(`${row.Entity_Type_1}-${row.Entity_Type_2}`)) {
+            addnodes2.push(Entity_1);
+            lastNode_enitity2.push(`${row.Entity_Type_1}-${row.Entity_Type_2}`)
+            return true; 
+          }
+          else {
+            return false; 
+          }
         }
       }
 
       // change will be there
+
+
       if (addnodestemp.includes(Entity_1)) {
         if (Object.keys(SingleCheckCustomer)[0] !== "N_SUPPLIER") {
           if (
@@ -444,10 +356,12 @@ const ForceGraph2DComponent = () => {
           }
         }
 
+       
+
+
         if (
           row.Entity_Type_1 === row.Entity_Type_2
-          // row.Entity_Type_1 === "N_PARTNUMBER" &&
-          // row.Entity_Type_2 === "N_PARTNUMBER"
+         
         ) {
           if (isAscending) {
             // downward
@@ -472,15 +386,34 @@ const ForceGraph2DComponent = () => {
               addnodes2.push(Entity_2);
               return true; // Include this row
             } else {
-              return false;
+              return true;
             }
           }
         } else {
-          addnodes2.push(Entity_2);
-          return true; // Include this row
+          // addnodes2.push(Entity_2);
+          // return true; // Include this row
+
+
+          if(flag){
+            flag =false ; 
+            addnodes2.push(Entity_2);
+            lastNode_enitity1.push(`${row.Entity_Type_1}-${row.Entity_Type_2}`)
+
+            console.log(lastNode_enitity1 ,'lastNode lastNode lastNode ')
+
+            return true; 
+          }
+          else if ( !lastNode_enitity2.includes(`${row.Entity_Type_1}-${row.Entity_Type_2}`)) {
+            addnodes2.push(Entity_2);
+            lastNode_enitity1.push(`${row.Entity_Type_1}-${row.Entity_Type_2}`)
+            return true; 
+          }
+          else {
+            return false; 
+          }
         }
       }
-
+      
       return false; // Exclude this row
     });
     console.log(filteredRows, "filteredRows");
@@ -499,10 +432,20 @@ const ForceGraph2DComponent = () => {
         SingleCheckCustomer[property] === item.Entity_2 ||
         SingleCheckCustomer[property] === undefined;
 
+
+
+          // console.log( SingleCheckCustomer[property] , 'SingleCheckCustomer[property]')
       if (SingleCheckCustomer[property] === item.Entity_1)
+      {
+         console.log( item.Entity_1 , 'item.Entity_1   sddsds dsd sdd d a ')
         add_nodes.push(item.Entity_2);
+      }
       if (SingleCheckCustomer[property] === item.Entity_2)
+      {
+
+        console.log( item.Entity_2 , 'item.Entity_2      wsdsds ')
         add_nodes.push(item.Entity_1);
+      }
 
       return matchesProperty;
     });
@@ -568,28 +511,37 @@ const ForceGraph2DComponent = () => {
           }
           // filter by id
           else {
+
+
             let filteredData = result.data.filter((row) => {
               return (
                 checkedLinkNames.includes(row.Edge_Type) &&
                 checkedEntityNames.includes(row.Entity_Type_1) &&
                 checkedEntityNames.includes(row.Entity_Type_2)
+
               );
             });
-
+console.log(filteredData , "filrterddata there ")
             const key = Object.keys(SingleCheckCustomer)[0]; // Dynamically get the key
+
             if (key && SingleCheckCustomer[key] !== undefined) {
-              console.log(key, "key here is the key there ");
+              console.log(key,Object.values(SingleCheckCustomer)[0]   , "key here is the key there ");
+             
               let file_filters = filterByProperty(filteredData, key);
             }
 
             if (Object.keys(SingleCheckCustomer)[0] === "N_PARTNUMBER") {
-              add_nodes = [Object.values(SingleCheckCustomer)[0]];
             }
+            add_nodes = [Object.values(SingleCheckCustomer)[0]];
+
+
+console.log(add_nodes , 'add_nodes     is ki value')
 
             let filterFunctionResult = filterAndUpdateNodes_input(
               filteredData,
               add_nodes
             );
+            console.log(filterFunctionResult , 'filterFunctionResult filterFunctionResult')
             // 1
             filterFunctionResult = filterAndUpdateNodes_input(
               filteredData,
