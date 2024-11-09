@@ -12,18 +12,10 @@ import { Link } from "react-router-dom";
 import InputNode from "three/examples/jsm/nodes/core/InputNode.js";
 
 const csvFiles = [
-  "/EDGES/E_BOM.csv",
-  "/EDGES/E_ORDERCUST.csv",
-  "/EDGES/E_ORDERSUPP.csv",
-  "/EDGES/E_PNSELLORD.csv",
-  "/EDGES/E_PNSUPPORD.csv",
+
 ];
 const csvFiles2 = [
-  "/NODES/N_CUSTOMER.csv",
-  "/NODES/N_PARTNUMBER.csv",
-  "/NODES/N_PURCHORDER.csv",
-  "/NODES/N_SELLORDER.csv",
-  "/NODES/N_SUPPLIER.csv",
+
 ];
 
 const Visualize_filteration = () => {
