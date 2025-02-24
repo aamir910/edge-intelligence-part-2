@@ -15,7 +15,7 @@ const Force3D = () => {
 
   useEffect(() => {
     Papa.parse(
-      "https://entertainmentbuz.com//EDGE_INTELLIGENCE/Get_merge_file.php",
+      "https://213.21.189.116//EDGE_INTELLIGENCE/Get_merge_file.php",
       {
         download: true,
         header: true,

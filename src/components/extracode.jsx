@@ -19,10 +19,10 @@ useEffect(() => {
   const loadAllCSVs = async () => {
     try {
       // Fetch entity (node) files
-      const entityResponse = await fetch('https://entertainmentbuz.com/EDGE_INTELLIGENCE/get_nodes_edges_csv.php?type=entity-files');
+      const entityResponse = await fetch('https://213.21.189.116/EDGE_INTELLIGENCE/get_nodes_edges_csv.php?type=entity-files');
       
       // Fetch link (edge) files
-      const linkResponse = await fetch('https://entertainmentbuz.com/EDGE_INTELLIGENCE/get_nodes_edges_csv.php?type=link-files');
+      const linkResponse = await fetch('https://213.21.189.116/EDGE_INTELLIGENCE/get_nodes_edges_csv.php?type=link-files');
       
       if (!entityResponse.ok || !linkResponse.ok) {
         throw new Error("Failed to fetch files from the backend");
@@ -95,10 +95,10 @@ useEffect(() => {
   const loadAllCSVs = async () => {
     try {
       // Fetch entity (node) files
-      const entityResponse = await fetch('https://entertainmentbuz.com/EDGE_INTELLIGENCE/get_nodes_edges_csv.php?type=entity-files');
+      const entityResponse = await fetch('https://213.21.189.116/EDGE_INTELLIGENCE/get_nodes_edges_csv.php?type=entity-files');
       
       // Fetch link (edge) files
-      const linkResponse = await fetch('https://entertainmentbuz.com/EDGE_INTELLIGENCE/get_nodes_edges_csv.php?type=link-files');
+      const linkResponse = await fetch('https://213.21.189.116/EDGE_INTELLIGENCE/get_nodes_edges_csv.php?type=link-files');
       
       if (!entityResponse.ok || !linkResponse.ok) {
         throw new Error("Failed to fetch files from the backend");

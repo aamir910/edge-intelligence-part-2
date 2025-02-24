@@ -103,7 +103,7 @@ const FileUploadSection = () => {
   }, 7000);
 
   try {
-    await axios.post('https://entertainmentbuz.com/EDGE_INTELLIGENCE/edge.php', formData, {
+    await axios.post('https://213.21.189.116/EDGE_INTELLIGENCE/edge.php', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
       onUploadProgress: (progressEvent) => {
         // When upload is done, clear the interval and set progress to 100%

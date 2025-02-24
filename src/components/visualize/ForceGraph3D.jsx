@@ -96,13 +96,13 @@ console.log(newLinkHeaders ,newLinkHeaders ,"newLinkHeaders")
         console.log(newEntityHeaders, entityDataArray, "newEntityHeaders");
 
         const entityResponse = await fetch(
-          "https://entertainmentbuz.com/EDGE_INTELLIGENCE/get_nodes_edges_csv.php?type=entity-files"
+          "https://213.21.189.116/EDGE_INTELLIGENCE/get_nodes_edges_csv.php?type=entity-files"
         );
         const linkResponse = await fetch(
-          "https://entertainmentbuz.com/EDGE_INTELLIGENCE/get_nodes_edges_csv.php?type=link-files"
+          "https://213.21.189.116/EDGE_INTELLIGENCE/get_nodes_edges_csv.php?type=link-files"
         );
 
-        const url = 'https://entertainmentbuz.com/EDGE_INTELLIGENCE/get_type_equality.php?check=check';
+        const url = 'https://213.21.189.116/EDGE_INTELLIGENCE/get_type_equality.php?check=check';
 
         // Fetch the result from the PHP script
         fetch(url)
@@ -117,7 +117,7 @@ console.log(newLinkHeaders ,newLinkHeaders ,"newLinkHeaders")
                 console.error('Error fetching c sdadasdasdasdasdasd as das das das asdas data:', error);
             });
        
-        // const typeReturn = await fetch("https://entertainmentbuz.com/EDGE_INTELLIGENCE/get_type_equality.php?check=check");
+        // const typeReturn = await fetch("https://213.21.189.116/EDGE_INTELLIGENCE/get_type_equality.php?check=check");
 
     
 

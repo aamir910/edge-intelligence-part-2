@@ -20,7 +20,7 @@ const DeleteFilesButton = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('https://entertainmentbuz.com/EDGE_INTELLIGENCE/delete_directory.php', {
+      const response = await fetch('https://213.21.189.116/EDGE_INTELLIGENCE/delete_directory.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
